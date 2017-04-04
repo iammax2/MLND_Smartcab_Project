@@ -133,8 +133,10 @@ class LearningAgent(Agent):
 		if random.random()<= self.epsilon:
 			action = random.choice(self.valid_actions)
 		else:
-			action = max(self.Q[state], key = self.Q[state].get)
-			
+			if self.Q[state][max(self.Q[state], key = self.Q[state].get)] == 0.0:
+				action = random.choice(self.valid_actions)
+			else:
+				action = max(self.Q[state], key = self.Q[state].get)
         return action
 
 
@@ -149,7 +151,7 @@ class LearningAgent(Agent):
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
 	if self.learning:
-		self.Q[state][action] = self.Q[state][action] + (self.alpha * reward)
+		self.Q[state][action] = (1 - self.alpha) * reward + self.Q[state][action]
 	return
 
 

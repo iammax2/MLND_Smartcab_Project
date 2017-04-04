@@ -11813,7 +11813,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[112]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Import the visualization code</span>
@@ -11863,7 +11863,7 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
 <p><strong>The smartcab stays in the same place the entire simulation.</strong></p>
-<p><strong>The agent recieves a reward for being idled at a red light and being idled at a green light with oncoming traffic. </strong></p>
+<p><strong>The agent recieves a reward for being idled at a red light and being idled at a green light with oncoming traffic. However, the smartcab recieves a negative reward if it chooses None when there's a green light and no oncoming traffic. </strong></p>
 <p><strong>The rewards are determined based on the actions the agent (the smartcab) takes in relation to the state. At present, the state seems to include two factors: light color (red or green) and traffic (oncoming trafic or no oncoming traffic). The right action accompying certain states produces a positive reward, the wrong action in certain states produces a negative reward. The light changing color will change the state, thus a different set of actions are needed in the new state to produce a reward. </strong></p>
 
 </div>
@@ -11901,7 +11901,7 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
 <p><strong>Three flags in agent.py: Under def <em>init</em> there is the parameter learning =, this can be either True or False. Turning this flag to True allows the agent to learn. Under the same function, the parameter alpha= is very important. As discussed in the lesson videos, this value is our learning rate. The higher this value (maxing out at 1) the greater the weight on new training examples, the lower this number (minimum 0) the lower the weight on new training examples. If this number is 0.5 it is basically taking the average of the new training example and the old learning policy. Basically this value defines how 'flexible' the algorithm is to new experience. Finally epsilon= in this same function represents the exploration factor. This number also has a range between 0 and 1 and is thought of as a percentage between 0 and 100. The exploration factor determines the level of randomness the agent partakes in when learning. This randomness is desgined to prevent convergence on a local minimum and to fully explore all possible states. In one of the videos, Michael describe this factor as taking an occassional random step when hill climbing (referencing gradient descent). </strong></p>
-<p><strong>Environment.py: the class Agent(object) function"</strong></p>
+<p><strong>Environment.py: the class function act(self, agent, action)</strong></p>
 <p><strong>Simulator.py: the render_text() function is the NON-GUI render display of the simulation (displayed in the terminal). Where as render() is the GUI render display of the simulation.</strong></p>
 <p><strong>planner.py: The next_waypoint() function considers the East-West direction first before the North-South direction.</strong></p>
 
@@ -13648,6 +13648,8 @@ CQtTkiRJkiRJ6sT/A4VLXokoeFjmAAAAAElFTkSuQmCC
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer: The waypoint for the smartcab is either (forward, right, or left) so that's 3 possible options for the first variable. The light variable is either (red or green) so that's 2 possible options for the second variable. The left, right, and oncoming varibles all return (left, right, forward, or none) which means there are 4 possible options for each one of those variables. This leaves one with (3 x 2 x 4 x 4 x 4) or 384 possible states.</strong></p>
 <p><strong>If one were to include deadline in the possible states, in would increase the states by a massive factor, and not add much meaningful information.</strong></p>
+<p><strong>In the final model of my smart cab, I lessened the possible states in order to limit the number of trials needed to get good results. I took out the left and right states from my model which decreased its size from 384 possible states to (3 x 2 x 4) 24 possible states. These states describe if a vehicle oncoming has it's signal lights on, that is the next state of the vehicles. I don't need to know the next state of these cars (it could be useful information in certain rare situations) but I have enough information about the cars around me to drive safely with just the oncoming variable. Many of the smartcab forum posts support the removal of these variables because the amount of useful information they give to a model is not worth the way they expand the state space. For example adding 'right' and 'left' may increase the saftey of my model by 3% to 5%, but it increases the state space by <em>16 times</em>. This marginal increase in accuracy is not worth the giant increase in state space. </strong></p>
+<p><strong>The best evidence for the removal of these two variables from my state space is that the learning model works without them! I recieved two A+'s only using the three variables in the state space. I feel no need to complicate the model with information it doesn't need.</strong></p>
 
 </div>
 </div>
@@ -18875,6 +18877,14 @@ Cy4EylQQTlwAAAAASUVORK5CYII=
 <p><strong> -- None : 4.02 </strong></p>
 <p><strong> -- left : -100.22 </strong></p>
 <p><strong>Generally the best action on a red light is None, but if there's not traffic, and it's benifical to go right (ie the waypoint is directing it so), then right is the optimal policy. The Q_value for right is not as high as expected (in comparison to other cases) which shows that this space was not explored very often, but it still came up enough to learn a good policy.</strong></p>
+<p><strong>I found a situation where the Qlearning did not find the optimal policy:</strong></p>
+<p><strong>State 4</strong>
+<strong>('right', 'red', None)</strong></p>
+<p><strong> -- forward : -513.285 </strong></p>
+<p><strong> -- right : -26.97 </strong></p>
+<p><strong> -- None : 247.41 </strong></p>
+<p><strong> -- left : -537.62 </strong></p>
+<p><strong> In this situation there is not a oncoming car, so it <em>could</em> turn right, but then again there could be a car right (because I removed this from the state space it can't know) thus it chooses the safe choice of staying None. This is an example of a choice that is not the optimal policy because the state space is not large enough. However, the choice is makes is a good choice, and still keeps the car safe and relieabile it<em> may</em> (depending on the right space) not be the optimal policy.</strong></p>
 
 </div>
 </div>
